@@ -2,6 +2,7 @@ package util
 
 import "github.com/google/uuid"
 
+// GetAssetAccount hardcode chart accounts for simplicity
 func GetAssetAccount() (accountId uuid.UUID) {
 	accountId, err := uuid.Parse("c19f00b4-c457-43f5-9e30-d10ada02a94f")
 	if err != nil {

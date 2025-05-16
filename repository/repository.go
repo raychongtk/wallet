@@ -9,5 +9,6 @@ var (
 		ProvideAccountRepository,
 		ProvideWalletRepository,
 		ProvideTransactionRepository,
+		ProvideBalanceRepository,
 	)
 )

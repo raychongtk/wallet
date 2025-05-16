@@ -4,7 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/raychongtk/wallet/model/movement"
+	"github.com/raychongtk/wallet/model/wallet"
 	"github.com/raychongtk/wallet/util"
+	"gorm.io/gorm"
 	"net/http"
 	"time"
 )
@@ -31,7 +33,7 @@ func (s *Service) Deposit(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &depositResponse{Result: false, ErrorCode: "INVALID_ACCOUNT"})
 		return
 	}
-	wallet, err := s.walletRepo.GetWallet(account.ID)
+	userWallet, err := s.walletRepo.GetWallet(account.ID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, &depositResponse{Result: false, ErrorCode: "INVALID_ACCOUNT"})
 		return
@@ -42,7 +44,6 @@ func (s *Service) Deposit(ctx *gin.Context) {
 		return
 	}
 
-	// Start a database transaction
 	tx := s.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -54,7 +55,7 @@ func (s *Service) Deposit(ctx *gin.Context) {
 	newMovement := &movement.Movement{
 		ID:             uuid.New(),
 		DebitWalletID:  util.GetAssetAccount(),
-		CreditWalletID: wallet.ID,
+		CreditWalletID: userWallet.ID,
 		DebitBalance:   balance,
 		CreditBalance:  balance,
 		MovementStatus: "COMPLETED",
@@ -68,20 +69,41 @@ func (s *Service) Deposit(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &depositResponse{Result: false, ErrorCode: "CREATE_MOVEMENT_FAILED"})
 		return
 	}
-	transactions := GenerateTransactions(balance, wallet.ID, createdMovement.ID)
+	transactions := GenerateTransactions(balance, userWallet.ID, createdMovement.ID)
 	err = s.transactionRepo.CreateTransactions(transactions)
 	if err != nil {
 		tx.Rollback()
 		ctx.JSON(http.StatusBadRequest, &depositResponse{Result: false, ErrorCode: "CREATE_TRANSACTION_FAILED"})
 		return
 	}
-	// Update the wallet balance
-	// Commit the transaction
+	committed := commitBalance(s, userWallet, balance, tx)
+
+	if !committed {
+		tx.Rollback()
+		ctx.JSON(http.StatusBadRequest, &depositResponse{Result: false, ErrorCode: "UPDATE_BALANCE_FAILED"})
+		return
+	}
+
 	if err := tx.Commit().Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, &depositResponse{Result: false, ErrorCode: "COMMIT_FAILED"})
 		return
 	}
 	ctx.JSON(http.StatusOK, &depositResponse{Result: true})
+}
+
+func commitBalance(s *Service, wallet *wallet.Wallet, balance int, tx *gorm.DB) bool {
+	// Skip reserved balance because we don't need to wait for external clearing operations
+	customerAccountErr := s.balanceRepo.UpdateBalance(wallet.ID, balance, "COMMITTED")
+	if customerAccountErr != nil {
+		tx.Rollback()
+		return false
+	}
+	chartAccountError := s.balanceRepo.UpdateBalance(util.GetAssetAccount(), balance, "COMMITTED")
+	if chartAccountError != nil {
+		tx.Rollback()
+		return false
+	}
+	return true
 }
 
 func GenerateTransactions(balance int, creditWalletID uuid.UUID, movementID uuid.UUID) []movement.Transaction {

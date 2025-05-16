@@ -16,6 +16,7 @@ type Service struct {
 	accountRepo     repository.AccountRepository
 	walletRepo      repository.WalletRepository
 	transactionRepo repository.TransactionRepository
+	balanceRepo     repository.BalanceRepository
 	db              *gorm.DB
 }
 
@@ -25,6 +26,7 @@ func ProvideService(
 	accountRepo repository.AccountRepository,
 	walletRepo repository.WalletRepository,
 	transactionRepo repository.TransactionRepository,
+	balanceRepo repository.BalanceRepository,
 	db *gorm.DB,
 ) (*Service, error) {
 	return &Service{
@@ -33,6 +35,7 @@ func ProvideService(
 		accountRepo:     accountRepo,
 		walletRepo:      walletRepo,
 		transactionRepo: transactionRepo,
+		balanceRepo:     balanceRepo,
 		db:              db,
 	}, nil
 }
