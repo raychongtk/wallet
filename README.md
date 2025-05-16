@@ -122,6 +122,21 @@ Fund moves to chart account no matter what type of transfers. To keep it simple,
 Deposit 10 to User A = User A account + 10, ASSET_ACCOUNT + 10
 Withdrawal 10 from User A = User A account - 10, LIABILITY_ACCOUNT + 10
 Transfer 10 from User A to User B = User A account - 10, User B account + 10, LIABILITY_ACCOUNT + 10, LIABILITY_ACCOUNT - 10
+
+## Money Movement
+Money Movement should have multiple statuses to indicate whether a fund is settled, pending or cancelled. In this PoC, since we don't have any payment gateway, we will assume all transactions are settled. But in the future, we can add more statuses to indicate the fund movement status.
+```mermaid
+flowchart LR
+    Movement --> Pending
+    Pending --> Settled
+    Pending --> Cancelled
+    Cancelled --> RevertFund
+    Settled --> CommitFund
+```
+
+## Wallet Status
+In real-world scenario, we might need to close account/wallet for some reason. For example, user account is closed, or wallet is closed. In this PoC, we will assume all wallets are open and available for money movement.
+
 ---
 # Architecture
 ## Wallet Domain
