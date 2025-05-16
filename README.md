@@ -19,6 +19,11 @@ This project is to create a wallet service for PoC.
 1. Spin up necessary dependencies by running `docker-compose up -d`
 2. Execute Makefile by running `make` command in your terminal
 ---
+
+# API Design
+- Endpoint follows RESTful style to provide resource-based API
+---
+
 # Database Design
 ```mermaid
 ---
@@ -110,7 +115,31 @@ Single Currency design is adopted in this PoC, but we remain the design extensib
 Transactions happened in the ledger should be recorded on both debit and credit wallet so that we can trace the fund movement in the treasury system.
 
 ---
-# Future Iteration
+# Architecture
+## Wallet Domain
+```mermaid
+flowchart TD
+    WalletPlatform --> Account
+    Account --> Wallet
+    Wallet --> Balance
+    WalletPlatform --> Movement
+    Movement --> Transaction
+    WalletPlatform --> User
+```
+
+## Wallet Flow
+```mermaid
+flowchart TD
+    User --> WalletService
+    WalletService --> AuthCondition{isAuthenticated}
+    AuthCondition --> End
+    AuthCondition --> Authenticated
+    Authenticated --> GetWallet
+    GetWallet --> CreateMovement
+    CreateMovement --> CreateTransactions
+    CreateTransactions --> MoveMoneyBetweenWallets
+```
+# Future Iteration - Our of Scope but Worth to Explore
 ## Observability
 Funds should be observable so that the engineering team and operation team can learn the current funds state.
 It indicates whether the treasury system is healthy or not. If any abnormal happens, an alert should be triggered.
@@ -131,3 +160,28 @@ Ledger is a data intensive application which we need to store any movement to th
 
 ## Hot/Cold Data Separation
 Hot/Cold Data Separation can also improve scalability when data grow quickly. This can improve both read and write performance in huge data size scenarios.
+
+# Treasury System Big Picture
+```mermaid
+flowchart TD
+    PaymentGateway --> PaymentOrchestrator
+    PaymentOrchestrator -...-> LedgerService
+    LedgerService -...-> LedgerReadReplica
+    LedgerReadReplica --> Snapshot
+    LedgerReadReplica --> Aggregation
+    LedgerReadReplica --> DataProvider
+    DataProvider --> ReconciliationData
+    DataProvider --> OperationalData
+    DataProvider --> SafeguardingData
+    DataProvider --> AlertData
+    AlertData -...-> Observability
+    Observability --> Alert
+    Observability --> Dashboard
+    Alert --> InsufficientFunds
+    Alert --> UnclearFunds
+    LedgerService -...-> Traceability
+    Traceability --> AuditLog
+    Traceability --> FundMovement
+    AuditLog --> WhoDidWhatAndWhen
+    FundMovement --> TraceMovementFlowAndState
+```
