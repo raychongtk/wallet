@@ -114,6 +114,14 @@ Single Currency design is adopted in this PoC, but we remain the design extensib
 ## Double-entry Bookkeeping
 Transactions happened in the ledger should be recorded on both debit and credit wallet so that we can trace the fund movement in the treasury system.
 
+## Accounting
+Fund moves to chart account no matter what type of transfers. To keep it simple, we have:
+1. ASSET_ACCOUNT
+2. LIABILITY_ACCOUNT
+
+Deposit 10 to User A = User A account + 10, ASSET_ACCOUNT + 10
+Withdrawal 10 from User A = User A account - 10, LIABILITY_ACCOUNT + 10
+Transfer 10 from User A to User B = User A account - 10, User B account + 10, LIABILITY_ACCOUNT + 10, LIABILITY_ACCOUNT - 10
 ---
 # Architecture
 ## Wallet Domain

@@ -9,7 +9,8 @@ type Movement struct {
 	ID             uuid.UUID
 	DebitWalletID  uuid.UUID
 	CreditWalletID uuid.UUID
-	Balance        int
+	DebitBalance   int
+	CreditBalance  int
 	MovementStatus string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time

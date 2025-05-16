@@ -3,33 +3,28 @@ package repository
 import (
 	"errors"
 	"github.com/google/uuid"
-	"github.com/google/wire"
 	"github.com/raychongtk/wallet/model/user"
 	"gorm.io/gorm"
 )
 
-var (
-	WireSet = wire.NewSet(NewRepository)
-)
-
 type UserRepository interface {
-	GetAccount(id uuid.UUID) (*user.AppUser, error)
+	GetUser(id uuid.UUID) (*user.AppUser, error)
 }
 
 type PgUserRepository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db gorm.DB) UserRepository {
+func ProvideUserRepository(db gorm.DB) UserRepository {
 	return &PgUserRepository{&db}
 }
 
-func (m *PgUserRepository) GetAccount(id uuid.UUID) (*user.AppUser, error) {
-	user, err := m.find(id)
+func (m *PgUserRepository) GetUser(id uuid.UUID) (*user.AppUser, error) {
+	appUser, err := m.find(id)
 	if err != nil {
 		return nil, err
 	}
-	return user, nil
+	return appUser, nil
 }
 
 func (m *PgUserRepository) find(id uuid.UUID) (*user.AppUser, error) {

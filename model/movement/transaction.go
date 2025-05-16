@@ -7,14 +7,13 @@ import (
 )
 
 type Transaction struct {
-	ID             uuid.UUID
-	DebitWalletID  uuid.UUID
-	CreditWalletID uuid.UUID
-	BalanceType    wallet.BalanceType
-	Balance        int
-	MovementStatus string
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	ID          uuid.UUID
+	MovementID  uuid.UUID
+	WalletID    uuid.UUID
+	BalanceType wallet.BalanceType
+	Balance     int
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 func (transaction Transaction) TableName() string {

@@ -9,6 +9,7 @@ type Wallet struct {
 	ID           uuid.UUID
 	AccountID    uuid.UUID
 	Currency     string
+	DecimalPlace int
 	WalletStatus string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time

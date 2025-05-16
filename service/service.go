@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/google/wire"
 	"github.com/raychongtk/wallet/repository"
+	"gorm.io/gorm"
 )
 
 var (
@@ -10,9 +11,28 @@ var (
 )
 
 type Service struct {
-	userRepo repository.UserRepository
+	userRepo        repository.UserRepository
+	movementRepo    repository.MovementRepository
+	accountRepo     repository.AccountRepository
+	walletRepo      repository.WalletRepository
+	transactionRepo repository.TransactionRepository
+	db              *gorm.DB
 }
 
-func ProvideService(repository repository.UserRepository) (*Service, error) {
-	return &Service{userRepo: repository}, nil
+func ProvideService(
+	userRepo repository.UserRepository,
+	movementRepo repository.MovementRepository,
+	accountRepo repository.AccountRepository,
+	walletRepo repository.WalletRepository,
+	transactionRepo repository.TransactionRepository,
+	db *gorm.DB,
+) (*Service, error) {
+	return &Service{
+		userRepo:        userRepo,
+		movementRepo:    movementRepo,
+		accountRepo:     accountRepo,
+		walletRepo:      walletRepo,
+		transactionRepo: transactionRepo,
+		db:              db,
+	}, nil
 }
