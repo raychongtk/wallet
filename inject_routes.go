@@ -6,6 +6,7 @@ package main
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/raychongtk/wallet/datastore"
 	"github.com/raychongtk/wallet/repository"
 	"github.com/raychongtk/wallet/route"
 	"github.com/raychongtk/wallet/service"

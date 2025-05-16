@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/google/wire"
-	"github.com/raychongtk/go-web/repository"
+	"github.com/raychongtk/wallet/repository"
 )
 
 var (
