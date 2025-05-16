@@ -116,22 +116,20 @@ Transactions happened in the ledger should be recorded on both debit and credit 
 
 ## Accounting
 Fund moves to chart account no matter what type of transfers. To keep it simple, we have:
-1. ASSET_ACCOUNT
-2. LIABILITY_ACCOUNT
+1. Asset Account
+2. Liability Account
 
-Deposit 10 to User A = User A account + 10, ASSET_ACCOUNT + 10
-Withdrawal 10 from User A = User A account - 10, LIABILITY_ACCOUNT + 10
-Transfer 10 from User A to User B = User A account - 10, User B account + 10, LIABILITY_ACCOUNT + 10, LIABILITY_ACCOUNT - 10
+- Deposit 10 to User A = User A account + 10, ASSET_ACCOUNT + 10
+- Withdrawal 10 from User A = User A account - 10, LIABILITY_ACCOUNT + 10
+- Transfer 10 from User A to User B = User A account - 10, User B account + 10, LIABILITY_ACCOUNT + 10, LIABILITY_ACCOUNT - 10
 
 ## Money Movement
 Money Movement should have multiple statuses to indicate whether a fund is settled, pending or cancelled. In this PoC, since we don't have any payment gateway, we will assume all transactions are settled. But in the future, we can add more statuses to indicate the fund movement status.
 ```mermaid
 flowchart LR
-    Movement --> Pending
-    Pending --> Settled
-    Pending --> Cancelled
-    Cancelled --> RevertFund
-    Settled --> CommitFund
+    Movement -->|ReserveFund| Pending
+    Pending -->|CommitFund| Settled
+    Pending -->|RevertFund| Cancelled
 ```
 
 ## Wallet Status
@@ -162,7 +160,29 @@ flowchart TD
     CreateMovement --> CreateTransactions
     CreateTransactions --> MoveMoneyBetweenWallets
 ```
+
+## Wallet Structure
+This design support multi-currency in the future. We can add more currencies in the wallet and balance table.
+In this PoC, we just support single currency for simplicity.
+```mermaid
+flowchart TB
+    Account --> Wallet
+    Wallet --> USD
+    Wallet --> GBP
+    Wallet --> HKD
+    Wallet --> JPY
+    Wallet --> CNY
+    Wallet --> EUR
+    Wallet --> ...
+    JPY --> ReservedDebit
+    JPY --> ReservedCredit
+    JPY --> Committed
+```
 # Future Iteration - Out of Scope but Worth to Explore
+## Movement State Transition
+Movement is a state machine. It should have multiple statuses to indicate the current stage of the fund. We create the movement in pending state and reserve the balance. When we receive callback from payment gateway, we settle the fund and move reserved balance to committed balance.
+With that, we can form a state machine to track the fund movement.
+
 ## Observability
 Funds should be observable so that the engineering team and operation team can learn the current funds state.
 It indicates whether the treasury system is healthy or not. If any abnormal happens, an alert should be triggered.
