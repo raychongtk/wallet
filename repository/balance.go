@@ -20,7 +20,6 @@ func ProvideBalanceRepository(db gorm.DB) BalanceRepository {
 }
 
 func (m *PgBalanceRepository) UpdateBalance(walletID uuid.UUID, balance int, balanceType wallet.BalanceType) error {
-	tx := m.db.Begin()
 	walletBalance, err := m.GetBalance(walletID, balanceType)
 	if err != nil {
 		return err
@@ -28,16 +27,14 @@ func (m *PgBalanceRepository) UpdateBalance(walletID uuid.UUID, balance int, bal
 	walletBalance.Balance += balance
 	result := m.db.Save(walletBalance)
 	if result.Error != nil {
-		tx.Rollback()
 		return result.Error
 	}
-	tx.Commit()
 	return nil
 }
 
 func (m *PgBalanceRepository) GetBalance(walletID uuid.UUID, balanceType wallet.BalanceType) (*wallet.Balance, error) {
 	var balance wallet.Balance
-	result := m.db.Where("wallet_id = ? AND balance_type = ?", walletID.String(), balanceType).Clauses(clause.Locking{Strength: "FOR UPDATE"}).First(&balance)
+	result := m.db.Clauses(clause.Locking{Strength: clause.LockingStrengthUpdate}).First(&balance, "wallet_id = ? AND balance_type = ?", walletID.String(), balanceType)
 	if result.Error != nil {
 		return nil, result.Error
 	}

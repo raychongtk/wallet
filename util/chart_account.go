@@ -4,7 +4,7 @@ import "github.com/google/uuid"
 
 // GetAssetAccount hardcode chart accounts for simplicity
 func GetAssetAccount() (accountId uuid.UUID) {
-	accountId, err := uuid.Parse("c19f00b4-c457-43f5-9e30-d10ada02a94f")
+	accountId, err := uuid.Parse("338b3f97-e428-4bff-9775-f759b5fccc4d")
 	if err != nil {
 		return
 	}
@@ -12,7 +12,7 @@ func GetAssetAccount() (accountId uuid.UUID) {
 }
 
 func GetLiabilityAccount() (accountId uuid.UUID) {
-	accountId, err := uuid.Parse("d3b07384-d9a0-4f3b-8a2b-6c9e5b8b8f3c")
+	accountId, err := uuid.Parse("141e3fd8-c350-4b44-a2d5-2e2602aca72a")
 	if err != nil {
 		return
 	}

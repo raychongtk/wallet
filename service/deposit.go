@@ -85,6 +85,7 @@ func (s *Service) Deposit(ctx *gin.Context) {
 	}
 
 	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
 		ctx.JSON(http.StatusInternalServerError, &depositResponse{Result: false, ErrorCode: "COMMIT_FAILED"})
 		return
 	}
