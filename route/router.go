@@ -13,6 +13,6 @@ var (
 func ProvideRoutes(service *service.Service) *gin.Engine {
 	r := gin.New()
 
-	r.POST("/api/v1/wallet/deposit", service.Register)
+	r.POST("/api/v1/wallet/deposit", service.Deposit)
 	return r
 }

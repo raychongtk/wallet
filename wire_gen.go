@@ -19,8 +19,13 @@ import (
 
 func injectRoutes(ctx context.Context) (*gin.Engine, error) {
 	db := datastore.ProvideDBConnection()
-	userRepository := repository.NewRepository(db)
-	serviceService, err := service.ProvideService(userRepository)
+	userRepository := repository.ProvideUserRepository(db)
+	movementRepository := repository.ProvideMovementRepository(db)
+	accountRepository := repository.ProvideAccountRepository(db)
+	walletRepository := repository.ProvideWalletRepository(db)
+	transactionRepository := repository.ProvideTransactionRepository(db)
+	balanceRepository := repository.ProvideBalanceRepository(db)
+	serviceService, err := service.ProvideService(userRepository, movementRepository, accountRepository, walletRepository, transactionRepository, balanceRepository, db)
 	if err != nil {
 		return nil, err
 	}
