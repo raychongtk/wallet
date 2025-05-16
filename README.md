@@ -139,7 +139,7 @@ flowchart TD
     CreateMovement --> CreateTransactions
     CreateTransactions --> MoveMoneyBetweenWallets
 ```
-# Future Iteration - Our of Scope but Worth to Explore
+# Future Iteration - Out of Scope but Worth to Explore
 ## Observability
 Funds should be observable so that the engineering team and operation team can learn the current funds state.
 It indicates whether the treasury system is healthy or not. If any abnormal happens, an alert should be triggered.
