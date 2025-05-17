@@ -114,7 +114,7 @@ erDiagram
 ---
 # Design Consideration
 ## Idempotency
-Deposit, Withdrawal, and Transfer are idempotent.
+Deposit, Withdrawal, and Transfer are idempotent. Request must be provided with a unique request id in the HTTP header - **X-Request-ID**.
 It means that if the same request is sent multiple times, the result will be the same as sending it once. This is to prevent double spending and ensure data consistency.
 Instead of sending back the same response, this PoC choose to reject the duplicated request.
 

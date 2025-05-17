@@ -10,10 +10,16 @@
 			"name": "1. Deposit Customer A",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "X-Request-ID",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"user_id\": \"2d988f4a-a037-4ce9-a350-f13445793e88\",\n    \"balance\": \"12\"\n}",
+					"raw": "{\n    \"user_id\": \"2d988f4a-a037-4ce9-a350-f13445793e88\",\n    \"balance\": \"12.000000001\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -41,7 +47,13 @@
 			"name": "1. Deposit Customer B",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "X-Request-ID",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"user_id\": \"c6e97817-0254-43ad-8610-7ac9d3f7af92\",\n    \"balance\": \"12\"\n}",
@@ -72,7 +84,13 @@
 			"name": "2. Deposit Failed with Invalid User",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "X-Request-ID",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"user_id\": \"2d988f4a-a037-4ce9-a350-f13445793e81\",\n    \"balance\": \"12\"\n}",
@@ -103,7 +121,13 @@
 			"name": "3. Withdrawal",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "X-Request-ID",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"user_id\": \"2d988f4a-a037-4ce9-a350-f13445793e88\",\n    \"balance\": \"12\"\n}",
@@ -165,7 +189,13 @@
 			"name": "5. Transfer",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "X-Request-ID",
+						"value": "{{$guid}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"credit_user_id\": \"2d988f4a-a037-4ce9-a350-f13445793e88\",\n    \"debit_user_id\": \"c6e97817-0254-43ad-8610-7ac9d3f7af92\",\n    \"balance\": \"12\"\n}",
