@@ -35,11 +35,9 @@ func TestWithdrawalAPI(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/withdrawal", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 
-	// Record the response
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
 
-	// Perform assertions
 	assert.Equal(t, http.StatusOK, resp.Code)
 	var response map[string]interface{}
 	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)

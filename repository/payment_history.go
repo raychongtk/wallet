@@ -7,6 +7,7 @@ import (
 
 type PaymentHistoryRepository interface {
 	CreatePaymentHistory(db *gorm.DB, paymentHistory *payment.PaymentHistory) (*payment.PaymentHistory, error)
+	SearchPaymentHistory(userId string) ([]payment.PaymentHistory, error)
 }
 
 type PgPaymentHistoryRepository struct {
@@ -23,4 +24,13 @@ func (m *PgPaymentHistoryRepository) CreatePaymentHistory(db *gorm.DB, paymentHi
 		return nil, result.Error
 	}
 	return paymentHistory, nil
+}
+
+func (m *PgPaymentHistoryRepository) SearchPaymentHistory(userId string) ([]payment.PaymentHistory, error) {
+	var paymentHistories []payment.PaymentHistory
+	result := m.db.Where("payer_user_id = ? OR payee_user_id = ?", userId, userId).Find(&paymentHistories)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return paymentHistories, nil
 }

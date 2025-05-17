@@ -51,5 +51,6 @@ func ProvideRoutes(service *Service) *gin.Engine {
 	r.POST("/api/v1/wallet/withdrawal", service.Withdraw)
 	r.POST("/api/v1/wallet/transfer", service.Transfer)
 	r.GET("/api/v1/wallet/balance", service.GetBalance)
+	r.GET("/api/v1/wallet/payment-history", service.GetPaymentHistory)
 	return r
 }

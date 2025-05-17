@@ -27,7 +27,7 @@ func setupTestDB() (*gorm.DB, func(), error) {
 		},
 		Files: []testcontainers.ContainerFile{
 			{
-				HostFilePath:      "../script/init.sql", // Path to your SQL file
+				HostFilePath:      "../script/init.sql",
 				ContainerFilePath: "/docker-entrypoint-initdb.d/init.sql",
 				FileMode:          0644,
 			},
@@ -43,7 +43,6 @@ func setupTestDB() (*gorm.DB, func(), error) {
 		return nil, nil, err
 	}
 
-	// Get the container's host and port
 	host, _ := postgresC.Host(ctx)
 	port, _ := postgresC.MappedPort(ctx, "5432/tcp")
 
@@ -61,6 +60,7 @@ func setupTestDB() (*gorm.DB, func(), error) {
 		repository.ProvideWalletRepository(*db),
 		repository.ProvideTransactionRepository(*db),
 		repository.ProvideBalanceRepository(*db),
+		repository.ProvidePaymentHistoryRepository(*db),
 		*db,
 	}
 
