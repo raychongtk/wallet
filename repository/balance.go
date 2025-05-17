@@ -8,7 +8,7 @@ import (
 )
 
 type BalanceRepository interface {
-	UpdateBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType wallet.BalanceType) error
+	UpdateBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error
 }
 
 type PgBalanceRepository struct {
@@ -19,7 +19,7 @@ func ProvideBalanceRepository(db gorm.DB) BalanceRepository {
 	return &PgBalanceRepository{&db}
 }
 
-func (m *PgBalanceRepository) UpdateBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType wallet.BalanceType) error {
+func (m *PgBalanceRepository) UpdateBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error {
 	walletBalance, err := m.GetBalance(db, walletID, balanceType)
 	if err != nil {
 		return err
@@ -32,7 +32,7 @@ func (m *PgBalanceRepository) UpdateBalance(db *gorm.DB, walletID uuid.UUID, bal
 	return nil
 }
 
-func (m *PgBalanceRepository) GetBalance(db *gorm.DB, walletID uuid.UUID, balanceType wallet.BalanceType) (*wallet.Balance, error) {
+func (m *PgBalanceRepository) GetBalance(db *gorm.DB, walletID uuid.UUID, balanceType string) (*wallet.Balance, error) {
 	var balance wallet.Balance
 	result := db.Clauses(clause.Locking{Strength: clause.LockingStrengthUpdate}).First(&balance, "wallet_id = ? AND balance_type = ?", walletID.String(), balanceType)
 	if result.Error != nil {

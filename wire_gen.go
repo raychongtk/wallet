@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/raychongtk/wallet/datastore"
 	"github.com/raychongtk/wallet/repository"
-	"github.com/raychongtk/wallet/route"
 	"github.com/raychongtk/wallet/service"
 )
 
@@ -29,6 +28,6 @@ func injectRoutes(ctx context.Context) (*gin.Engine, error) {
 	if err != nil {
 		return nil, err
 	}
-	engine := route.ProvideRoutes(serviceService)
+	engine := service.ProvideRoutes(serviceService)
 	return engine, nil
 }

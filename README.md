@@ -7,6 +7,7 @@ This project is to create a wallet service for PoC.
 - Postgresql
 - Docker
 - Docker Compose
+- Testcontainers
 - Wire
 - Gin
 - Gorm

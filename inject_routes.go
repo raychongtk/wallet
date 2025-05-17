@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/raychongtk/wallet/datastore"
 	"github.com/raychongtk/wallet/repository"
-	"github.com/raychongtk/wallet/route"
 	"github.com/raychongtk/wallet/service"
 )
 
@@ -19,6 +18,5 @@ func injectRoutes(ctx context.Context) (*gin.Engine, error) {
 		datastore.WireSet,
 		repository.WireSet,
 		service.WireSet,
-		route.WireSet,
 	))
 }
