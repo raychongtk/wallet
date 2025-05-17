@@ -236,6 +236,7 @@ Ledger is a data intensive application which we need to store any movement to th
 - Payment History
 - Movement
 - Transaction
+
 The above 3 tables must be partitioned to improve performance and scalability. We can partition the data by time. For example, we can partition the data by month or by year. This can improve the performance of the system when the data grow quickly.
 
 ## Hot/Cold Data Separation
