@@ -32,7 +32,6 @@ func (s *Service) Deposit(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &TransferResponse{Result: false, ErrorCode: "INVALID_PARAMETERS"})
 		return
 	}
-	util.With(zap.String("user_id", userId.String()), zap.Int("balance", balance))
 
 	appUser, err := s.userRepo.GetUser(userId)
 	if err != nil {
@@ -121,7 +120,10 @@ func (s *Service) Deposit(ctx *gin.Context) {
 		return
 	}
 
-	util.Info("Deposit successfully", zap.String("user_id", userId.String()), zap.Int("balance", balance))
+	util.Info("Deposit successfully",
+		zap.String("user_id", userId.String()),
+		zap.Int("balance", balance),
+	)
 	ctx.JSON(http.StatusOK, &DepositResponse{Result: true})
 }
 

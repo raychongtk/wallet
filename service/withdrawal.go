@@ -32,7 +32,6 @@ func (s *Service) Withdraw(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &TransferResponse{Result: false, ErrorCode: "INVALID_PARAMETERS"})
 		return
 	}
-	util.With(zap.String("user_id", userId.String()), zap.Int("balance", balance))
 
 	appUser, err := s.userRepo.GetUser(userId)
 	if err != nil {
@@ -122,7 +121,10 @@ func (s *Service) Withdraw(ctx *gin.Context) {
 		return
 	}
 
-	util.Info("Withdrawal successfully")
+	util.Info("Withdrawal successfully",
+		zap.String("user_id", userId.String()),
+		zap.Int("balance", balance),
+	)
 	ctx.JSON(http.StatusOK, &WithdrawalResponse{Result: true})
 }
 

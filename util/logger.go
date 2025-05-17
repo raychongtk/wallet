@@ -52,7 +52,3 @@ func Debug(message string, fields ...zap.Field) {
 func Warn(message string, fields ...zap.Field) {
 	GetLogger().Warn(message, fields...)
 }
-
-func With(fields ...zap.Field) {
-	GetLogger().With(fields...)
-}

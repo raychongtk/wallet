@@ -41,7 +41,6 @@ func (s *Service) Transfer(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &TransferResponse{Result: false, ErrorCode: "INVALID_ACCOUNT"})
 		return
 	}
-	util.With(zap.String("credit_user_id", creditUserId.String()), zap.String("debit_user_id", debitUserId.String()))
 
 	creditAppUser, err := s.userRepo.GetUser(creditUserId)
 	if err != nil {
@@ -83,7 +82,6 @@ func (s *Service) Transfer(ctx *gin.Context) {
 		return
 	}
 
-	util.With(zap.String("balance", req.Balance))
 	tx := s.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -172,7 +170,11 @@ func (s *Service) Transfer(ctx *gin.Context) {
 		return
 	}
 
-	util.Info("Transfer successfully")
+	util.Info("Transfer successfully",
+		zap.String("credit_user_id", creditUserId.String()),
+		zap.String("debit_user_id", debitUserId.String()),
+		zap.String("balance", req.Balance),
+	)
 	ctx.JSON(http.StatusOK, &TransferResponse{Result: true})
 }
 
