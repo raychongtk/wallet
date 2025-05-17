@@ -112,6 +112,14 @@ erDiagram
 - **Reliability** - Data is consistent and reliable. Data quality is important
 - **Traceability** - Transaction logs should be traceable. Able to provide what happens in the system and a particular wallet
 ---
+# Assumption
+- Assume request is authenticated and authorized
+- Assume performance is not a problem in this stage
+- Assume all transactions are settled immediately without any payment gateway
+- Assume all wallets are open and available for money movement
+- Assume all wallets are in single currency and in USD
+---
+
 # Design Consideration
 ## Idempotency
 Deposit, Withdrawal, and Transfer are idempotent. Request must be provided with a unique request id in the HTTP header - **X-Request-ID**.
@@ -272,3 +280,4 @@ flowchart TD
     AuditLog --> WhoDidWhatAndWhen
     FundMovement --> TraceMovementFlowAndState
 ```
+Total Duration: 2 days
