@@ -22,6 +22,13 @@ This project is to create a wallet service for PoC.
 # How to run?
 - Execute Makefile by running `make` and `make start` commands in your terminal
 ---
+# How to review?
+- Go through the ReadMe file to understand the design and architecture
+- Go through the code to understand the implementation
+  - Start from the service package. It contains all service implementation and business logic
+  - model package stores all database domain models
+  - repository package stores all database repository implementation
+---
 
 # API Design
 - Endpoint follows RESTful style to provide resource-based API
