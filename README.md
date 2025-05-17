@@ -15,16 +15,18 @@ This project is to create a wallet service for PoC.
 - Zap
 ---
 # Prerequisite
-- Docker must be installed
+- Docker and Docker Compose must be installed
 - If you get any error related to wire, please install `go get github.com/google/wire/cmd/wire` and make sure `$GOPATH/bin` is in your terminal path
 ---
 # How to run?
-1. Spin up necessary dependencies by running `docker-compose up -d`
-2. Execute Makefile by running `make run` command in your terminal
+- Execute Makefile by running `make` and `make start` commands in your terminal
 ---
 
 # API Design
 - Endpoint follows RESTful style to provide resource-based API
+
+Postman Collection: [Wallet.postman_collection.json](Wallet.postman_collection.json)
+
 ---
 
 # Database Design
@@ -110,7 +112,7 @@ erDiagram
 - **Traceability** - Transaction logs should be traceable. Able to provide what happens in the system and a particular wallet
 ---
 # Design Consideration
-## Keep it simple
+## Keep It Simple
 Monolith architecture is selected for this PoC. Although we should adopt distributed architecture for better scalability and availability, this is not suitable in this PoC. If we introduce microservices in this PoC, it will overkill the whole design.
 Instead, we keep it simple and modular. When we need to split the system into microservices, we can move code to separate project quickly.
 
@@ -124,7 +126,7 @@ Ledger should maintain traces to keep track all events happened in the platform.
 Ledger transactions and movements should be append-only. Once it is created, it is not allowed to modify.
 
 ## Single Currency
-Single Currency design is adopted in this PoC, but we remain the design extensible for multi-currency to cater to business growth.
+Single Currency design is adopted in this PoC, but we remain the design extensible for multi-currency to cater to business growth. Detailed design can be referred to the below sections
 
 ## Double-entry Bookkeeping
 Transactions happened in the ledger should be recorded on both debit and credit wallet so that we can trace the fund movement in the treasury system.
@@ -174,6 +176,7 @@ flowchart TD
     GetWallet --> CreateMovement
     CreateMovement --> CreateTransactions
     CreateTransactions --> MoveMoneyBetweenWallets
+    CreatePaymentHistory --> PaymentHistory
 ```
 
 ## Wallet Structure
@@ -193,6 +196,15 @@ flowchart TB
     JPY --> ReservedCredit
     JPY --> Committed
 ```
+
+# Testing
+## Integration Testing
+Integration tests are used to test the system. 
+In this project, I used testcontainers to spin up Postgresql database with real data and response from db instance. After that, requests were sent from controller and alongside hit the database to verify the end to end flow.
+
+## Manual Testing
+Manual testing is used to test the system by using Postman for the API testing. It verifies the API endpoints and the response from the server. It also verifies the database to check if the data is stored correctly.
+
 # Future Iteration - Out of Scope but Worth to Explore
 ## Movement State Transition
 Movement is a state machine. It should have multiple statuses to indicate the current stage of the fund. We create the movement in pending state and reserve the balance. When we receive callback from payment gateway, we settle the fund and move reserved balance to committed balance.
