@@ -176,6 +176,7 @@ flowchart TD
     GetWallet --> CreateMovement
     CreateMovement --> CreateTransactions
     CreateTransactions --> MoveMoneyBetweenWallets
+    MoveMoneyBetweenWallets --> CreatePaymentHistory
     CreatePaymentHistory --> PaymentHistory
 ```
 
