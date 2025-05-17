@@ -3,9 +3,9 @@ package util
 import "strconv"
 
 func ConvertToInt(value string) (int, error) {
-	intValue, err := strconv.Atoi(value)
+	floatValue, err := strconv.ParseFloat(value, 64)
 	if err != nil {
-		panic("failed to convert string to int: " + err.Error())
+		return 0, err
 	}
-	return intValue, nil
+	return int(floatValue * 100), nil
 }

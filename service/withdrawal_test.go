@@ -42,14 +42,13 @@ func TestWithdrawalAPI(t *testing.T) {
 	// Perform assertions
 	assert.Equal(t, http.StatusOK, resp.Code)
 	var response map[string]interface{}
-	println(response["result"])
 	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)
 	assert.NoError(t, responseErr)
 	assert.True(t, response["result"].(bool))
 
-	liabilityBalance, _ := service.balanceRepo.GetBalance(db, uuid.MustParse("141e3fd8-c350-4b44-a2d5-2e2602aca72a"), "COMMITTED")
+	liabilityBalance, _ := service.balanceRepo.GetBalanceWithLock(db, uuid.MustParse("141e3fd8-c350-4b44-a2d5-2e2602aca72a"), "COMMITTED")
 	assert.Equal(t, liabilityBalance.Balance, 10000)
-	customerBalance, _ := service.balanceRepo.GetBalance(db, uuid.MustParse("1cc535a5-bc57-4731-a64b-041b7ff41c30"), "COMMITTED")
+	customerBalance, _ := service.balanceRepo.GetBalanceWithLock(db, uuid.MustParse("1cc535a5-bc57-4731-a64b-041b7ff41c30"), "COMMITTED")
 	assert.Equal(t, customerBalance.Balance, 0)
 }
 
@@ -76,7 +75,6 @@ func TestWithdrawalAPIFailedWithInsufficientBalance(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
 	var response map[string]interface{}
-	println(response["result"])
 	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)
 	assert.NoError(t, responseErr)
 	assert.False(t, response["result"].(bool))
@@ -105,7 +103,6 @@ func TestWithdrawalAPIFailedWithInvalidUser(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
 	var response map[string]interface{}
-	println(response["result"])
 	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)
 	assert.NoError(t, responseErr)
 	assert.False(t, response["result"].(bool))
@@ -134,7 +131,6 @@ func TestWithdrawalAPIFailedWithInvalidBalance(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
 	var response map[string]interface{}
-	println(response["result"])
 	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)
 	assert.NoError(t, responseErr)
 	assert.False(t, response["result"].(bool))

@@ -48,16 +48,15 @@ func TestTransferAPI(t *testing.T) {
 	// Perform assertions
 	assert.Equal(t, http.StatusOK, resp.Code)
 	var response map[string]interface{}
-	println(response["result"])
 	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)
 	assert.NoError(t, responseErr)
 	assert.True(t, response["result"].(bool))
 
-	liabilityBalance, _ := service.balanceRepo.GetBalance(db, uuid.MustParse("141e3fd8-c350-4b44-a2d5-2e2602aca72a"), "COMMITTED")
+	liabilityBalance, _ := service.balanceRepo.GetBalanceWithLock(db, uuid.MustParse("141e3fd8-c350-4b44-a2d5-2e2602aca72a"), "COMMITTED")
 	assert.Equal(t, liabilityBalance.Balance, 0)
-	transferOutCustomerBalance, _ := service.balanceRepo.GetBalance(db, uuid.MustParse("1cc535a5-bc57-4731-a64b-041b7ff41c30"), "COMMITTED")
+	transferOutCustomerBalance, _ := service.balanceRepo.GetBalanceWithLock(db, uuid.MustParse("1cc535a5-bc57-4731-a64b-041b7ff41c30"), "COMMITTED")
 	assert.Equal(t, transferOutCustomerBalance.Balance, 0)
-	transferInCustomerBalance, _ := service.balanceRepo.GetBalance(db, uuid.MustParse("c7d90b83-e080-423a-ab1b-f48094d7533e"), "COMMITTED")
+	transferInCustomerBalance, _ := service.balanceRepo.GetBalanceWithLock(db, uuid.MustParse("c7d90b83-e080-423a-ab1b-f48094d7533e"), "COMMITTED")
 	assert.Equal(t, transferInCustomerBalance.Balance, 10000)
 }
 
@@ -85,7 +84,6 @@ func TestTransferAPIFailedWithInsufficientBalance(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
 	var response map[string]interface{}
-	println(response["result"])
 	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)
 	assert.NoError(t, responseErr)
 	assert.False(t, response["result"].(bool))
@@ -115,7 +113,6 @@ func TestTransferAPIFailedWithInvalidUser(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
 	var response map[string]interface{}
-	println(response["result"])
 	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)
 	assert.NoError(t, responseErr)
 	assert.False(t, response["result"].(bool))
@@ -145,7 +142,6 @@ func TestTransferAPIFailedWithSelfTransfer(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
 	var response map[string]interface{}
-	println(response["result"])
 	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)
 	assert.NoError(t, responseErr)
 	assert.False(t, response["result"].(bool))
@@ -175,7 +171,6 @@ func TestTransferAPIFailedWithInvalidBalance(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
 	var response map[string]interface{}
-	println(response["result"])
 	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)
 	assert.NoError(t, responseErr)
 	assert.False(t, response["result"].(bool))

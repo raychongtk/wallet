@@ -11,7 +11,8 @@ import (
 type BalanceRepository interface {
 	AddBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error
 	DeductBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string, accountType string) error
-	GetBalance(db *gorm.DB, walletID uuid.UUID, balanceType string) (*wallet.Balance, error)
+	GetBalanceWithLock(db *gorm.DB, walletID uuid.UUID, balanceType string) (*wallet.Balance, error)
+	GetBalance(walletID uuid.UUID, balanceType string) (*wallet.Balance, error)
 }
 
 type PgBalanceRepository struct {
@@ -23,7 +24,7 @@ func ProvideBalanceRepository(db gorm.DB) BalanceRepository {
 }
 
 func (m *PgBalanceRepository) AddBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error {
-	walletBalance, err := m.GetBalance(db, walletID, balanceType)
+	walletBalance, err := m.GetBalanceWithLock(db, walletID, balanceType)
 	if err != nil {
 		return err
 	}
@@ -36,7 +37,7 @@ func (m *PgBalanceRepository) AddBalance(db *gorm.DB, walletID uuid.UUID, balanc
 }
 
 func (m *PgBalanceRepository) DeductBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string, accountType string) error {
-	walletBalance, err := m.GetBalance(db, walletID, balanceType)
+	walletBalance, err := m.GetBalanceWithLock(db, walletID, balanceType)
 	if err != nil {
 		return err
 	}
@@ -51,9 +52,18 @@ func (m *PgBalanceRepository) DeductBalance(db *gorm.DB, walletID uuid.UUID, bal
 	return nil
 }
 
-func (m *PgBalanceRepository) GetBalance(db *gorm.DB, walletID uuid.UUID, balanceType string) (*wallet.Balance, error) {
+func (m *PgBalanceRepository) GetBalanceWithLock(db *gorm.DB, walletID uuid.UUID, balanceType string) (*wallet.Balance, error) {
 	var balance wallet.Balance
 	result := db.Clauses(clause.Locking{Strength: clause.LockingStrengthUpdate}).First(&balance, "wallet_id = ? AND balance_type = ?", walletID.String(), balanceType)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &balance, nil
+}
+
+func (m *PgBalanceRepository) GetBalance(walletID uuid.UUID, balanceType string) (*wallet.Balance, error) {
+	var balance wallet.Balance
+	result := m.db.First(&balance, "wallet_id = ? AND balance_type = ?", walletID.String(), balanceType)
 	if result.Error != nil {
 		return nil, result.Error
 	}

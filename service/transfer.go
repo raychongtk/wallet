@@ -90,7 +90,6 @@ func (s *Service) Transfer(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, &TransferResponse{Result: false, ErrorCode: "INTERNAL_ERROR"})
 		}
 	}()
-	balance = balance * 100
 	groupId := uuid.New()
 	var movements []movement.Movement
 	creditMovement := movement.Movement{

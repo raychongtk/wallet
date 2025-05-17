@@ -58,7 +58,6 @@ func (s *Service) Withdraw(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, &WithdrawalResponse{Result: false, ErrorCode: "INTERNAL_ERROR"})
 		}
 	}()
-	balance = balance * 100
 	groupId := uuid.New()
 	newMovement := &movement.Movement{
 		ID:             uuid.New(),
