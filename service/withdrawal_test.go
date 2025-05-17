@@ -11,7 +11,7 @@ import (
 )
 
 func TestWithdrawalAPI(t *testing.T) {
-	db, cleanup, err := setupTestDB()
+	db, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -28,12 +28,14 @@ func TestWithdrawalAPI(t *testing.T) {
 	// deposit before withdrawal
 	depositReq, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/deposit", bytes.NewBuffer(body))
 	depositReq.Header.Set("Content-Type", "application/json")
+	depositReq.Header.Set("X-Request-ID", uuid.New().String())
 
 	depositResp := httptest.NewRecorder()
 	router.ServeHTTP(depositResp, depositReq)
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/withdrawal", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
@@ -51,7 +53,7 @@ func TestWithdrawalAPI(t *testing.T) {
 }
 
 func TestWithdrawalAPIFailedWithInsufficientBalance(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -67,6 +69,7 @@ func TestWithdrawalAPIFailedWithInsufficientBalance(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/withdrawal", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
@@ -79,7 +82,7 @@ func TestWithdrawalAPIFailedWithInsufficientBalance(t *testing.T) {
 }
 
 func TestWithdrawalAPIFailedWithInvalidUser(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -95,6 +98,7 @@ func TestWithdrawalAPIFailedWithInvalidUser(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/withdrawal", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
@@ -107,7 +111,7 @@ func TestWithdrawalAPIFailedWithInvalidUser(t *testing.T) {
 }
 
 func TestWithdrawalAPIFailedWithInvalidBalance(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -123,6 +127,7 @@ func TestWithdrawalAPIFailedWithInvalidBalance(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/withdrawal", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)

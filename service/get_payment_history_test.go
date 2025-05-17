@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -10,7 +11,7 @@ import (
 )
 
 func TestGetPaymentHistoryAPI(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -25,6 +26,7 @@ func TestGetPaymentHistoryAPI(t *testing.T) {
 
 	depositReq, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/deposit", bytes.NewBuffer(depositBody))
 	depositReq.Header.Set("Content-Type", "application/json")
+	depositReq.Header.Set("X-Request-ID", uuid.New().String())
 
 	depositResp := httptest.NewRecorder()
 	router.ServeHTTP(depositResp, depositReq)
@@ -36,6 +38,7 @@ func TestGetPaymentHistoryAPI(t *testing.T) {
 	withdrawalBody, _ := json.Marshal(withdrawalPayload)
 	withdrawalReq, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/withdrawal", bytes.NewBuffer(withdrawalBody))
 	withdrawalReq.Header.Set("Content-Type", "application/json")
+	withdrawalReq.Header.Set("X-Request-ID", uuid.New().String())
 
 	withdrawalResp := httptest.NewRecorder()
 	router.ServeHTTP(withdrawalResp, withdrawalReq)
@@ -49,6 +52,7 @@ func TestGetPaymentHistoryAPI(t *testing.T) {
 
 	transferReq, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/transfer", bytes.NewBuffer(transferBody))
 	transferReq.Header.Set("Content-Type", "application/json")
+	transferReq.Header.Set("X-Request-ID", uuid.New().String())
 
 	transferResp := httptest.NewRecorder()
 	router.ServeHTTP(transferResp, transferReq)
@@ -84,7 +88,7 @@ func TestGetPaymentHistoryAPI(t *testing.T) {
 }
 
 func TestGetPaymentHistoryAPIWithInvalidUser(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}

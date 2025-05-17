@@ -11,7 +11,7 @@ import (
 )
 
 func TestTransferAPI(t *testing.T) {
-	db, cleanup, err := setupTestDB()
+	db, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -27,6 +27,7 @@ func TestTransferAPI(t *testing.T) {
 	// deposit before transfer
 	depositReq, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/deposit", bytes.NewBuffer(depositBody))
 	depositReq.Header.Set("Content-Type", "application/json")
+	depositReq.Header.Set("X-Request-ID", uuid.New().String())
 
 	depositResp := httptest.NewRecorder()
 	router.ServeHTTP(depositResp, depositReq)
@@ -40,6 +41,7 @@ func TestTransferAPI(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/transfer", bytes.NewBuffer(transferBody))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
@@ -59,7 +61,7 @@ func TestTransferAPI(t *testing.T) {
 }
 
 func TestTransferAPIFailedWithInsufficientBalance(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -76,6 +78,7 @@ func TestTransferAPIFailedWithInsufficientBalance(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/transfer", bytes.NewBuffer(transferBody))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
@@ -88,7 +91,7 @@ func TestTransferAPIFailedWithInsufficientBalance(t *testing.T) {
 }
 
 func TestTransferAPIFailedWithInvalidUser(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -105,6 +108,7 @@ func TestTransferAPIFailedWithInvalidUser(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/transfer", bytes.NewBuffer(transferBody))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
@@ -117,7 +121,7 @@ func TestTransferAPIFailedWithInvalidUser(t *testing.T) {
 }
 
 func TestTransferAPIFailedWithSelfTransfer(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -134,6 +138,7 @@ func TestTransferAPIFailedWithSelfTransfer(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/transfer", bytes.NewBuffer(transferBody))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
@@ -146,7 +151,7 @@ func TestTransferAPIFailedWithSelfTransfer(t *testing.T) {
 }
 
 func TestTransferAPIFailedWithInvalidBalance(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -163,6 +168,7 @@ func TestTransferAPIFailedWithInvalidBalance(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/transfer", bytes.NewBuffer(transferBody))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)

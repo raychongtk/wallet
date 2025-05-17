@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/go-redis/redis/v8"
 	"github.com/raychongtk/wallet/repository"
 	"github.com/raychongtk/wallet/util"
 	"github.com/testcontainers/testcontainers-go"
@@ -14,7 +15,7 @@ import (
 
 var service *Service
 
-func setupTestDB() (*gorm.DB, func(), error) {
+func setupTestDB() (*gorm.DB, *redis.Client, func(), error) {
 	util.InitializeLogger(false)
 	ctx := context.Background()
 
@@ -40,7 +41,7 @@ func setupTestDB() (*gorm.DB, func(), error) {
 		Started:          true,
 	})
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	host, _ := postgresC.Host(ctx)
@@ -50,7 +51,35 @@ func setupTestDB() (*gorm.DB, func(), error) {
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
+	}
+
+	redisReq := testcontainers.ContainerRequest{
+		Image:        "redis:6.2-alpine",
+		ExposedPorts: []string{"6379/tcp"},
+		WaitingFor:   wait.ForListeningPort("6379/tcp").WithStartupTimeout(30 * time.Second),
+	}
+
+	redisC, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: redisReq,
+		Started:          true,
+	})
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	redisHost, _ := redisC.Host(ctx)
+	redisPort, _ := redisC.MappedPort(ctx, "6379/tcp")
+
+	addr := fmt.Sprintf("%s:%s", redisHost, redisPort.Port())
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: addr,
+	})
+
+	_, err = redisClient.Ping(ctx).Result()
+	if err != nil {
+		redisC.Terminate(ctx)
+		return nil, nil, nil, err
 	}
 
 	service = &Service{
@@ -62,11 +91,13 @@ func setupTestDB() (*gorm.DB, func(), error) {
 		repository.ProvideBalanceRepository(*db),
 		repository.ProvidePaymentHistoryRepository(*db),
 		*db,
+		*redisClient,
 	}
 
 	cleanup := func() {
 		postgresC.Terminate(ctx)
+		redisC.Terminate(ctx)
 	}
 
-	return db, cleanup, nil
+	return db, redisClient, cleanup, nil
 }

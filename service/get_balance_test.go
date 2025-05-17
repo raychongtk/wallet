@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -10,7 +11,7 @@ import (
 )
 
 func TestGetBalanceAPI(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -25,6 +26,7 @@ func TestGetBalanceAPI(t *testing.T) {
 
 	depositReq, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/deposit", bytes.NewBuffer(body))
 	depositReq.Header.Set("Content-Type", "application/json")
+	depositReq.Header.Set("X-Request-ID", uuid.New().String())
 
 	depositResp := httptest.NewRecorder()
 	router.ServeHTTP(depositResp, depositReq)
@@ -38,11 +40,11 @@ func TestGetBalanceAPI(t *testing.T) {
 	var response map[string]interface{}
 	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)
 	assert.NoError(t, responseErr)
-	assert.Equal(t, response["balance"], "100.00")
+	assert.Equal(t, "100.00", response["balance"])
 }
 
 func TestGetBalanceAPIWithDecimal(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -57,6 +59,7 @@ func TestGetBalanceAPIWithDecimal(t *testing.T) {
 
 	depositReq, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/deposit", bytes.NewBuffer(body))
 	depositReq.Header.Set("Content-Type", "application/json")
+	depositReq.Header.Set("X-Request-ID", uuid.New().String())
 
 	depositResp := httptest.NewRecorder()
 	router.ServeHTTP(depositResp, depositReq)
@@ -74,7 +77,7 @@ func TestGetBalanceAPIWithDecimal(t *testing.T) {
 }
 
 func TestGetBalanceAPIWithInvalidUser(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}

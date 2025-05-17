@@ -11,7 +11,7 @@ import (
 )
 
 func TestDepositAPI(t *testing.T) {
-	db, cleanup, err := setupTestDB()
+	db, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -27,6 +27,7 @@ func TestDepositAPI(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/deposit", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
@@ -43,7 +44,7 @@ func TestDepositAPI(t *testing.T) {
 }
 
 func TestDepositAPIFailedWithInvalidUser(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -59,6 +60,7 @@ func TestDepositAPIFailedWithInvalidUser(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/deposit", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
@@ -71,7 +73,7 @@ func TestDepositAPIFailedWithInvalidUser(t *testing.T) {
 }
 
 func TestDepositAPIFailedWithInvalidBalance(t *testing.T) {
-	_, cleanup, err := setupTestDB()
+	_, _, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
 	}
@@ -87,6 +89,7 @@ func TestDepositAPIFailedWithInvalidBalance(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/deposit", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Request-ID", uuid.New().String())
 
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)

@@ -25,7 +25,8 @@ func injectRoutes(ctx context.Context) (*gin.Engine, error) {
 	transactionRepository := repository.ProvideTransactionRepository(db)
 	balanceRepository := repository.ProvideBalanceRepository(db)
 	paymentHistoryRepository := repository.ProvidePaymentHistoryRepository(db)
-	serviceService, err := service.ProvideService(userRepository, movementRepository, accountRepository, walletRepository, transactionRepository, balanceRepository, paymentHistoryRepository, db)
+	client := datastore.ProvideRedis()
+	serviceService, err := service.ProvideService(userRepository, movementRepository, accountRepository, walletRepository, transactionRepository, balanceRepository, paymentHistoryRepository, db, client)
 	if err != nil {
 		return nil, err
 	}
