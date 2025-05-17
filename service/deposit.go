@@ -26,6 +26,12 @@ func (s *Service) Deposit(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &DepositResponse{Result: false, ErrorCode: "INVALID_ACCOUNT"})
 		return
 	}
+	balance, err := util.ConvertToInt(req.Balance)
+	if err != nil || balance <= 0 {
+		ctx.JSON(http.StatusBadRequest, &TransferResponse{Result: false, ErrorCode: "INVALID_PARAMETERS"})
+		return
+	}
+
 	appUser, err := s.userRepo.GetUser(userId)
 	if err != nil {
 		util.Error("Invalid user", zap.Error(err))
@@ -44,11 +50,6 @@ func (s *Service) Deposit(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &DepositResponse{Result: false, ErrorCode: "INVALID_ACCOUNT"})
 		return
 	}
-	balance, err := util.ConvertToInt(req.Balance)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, &DepositResponse{Result: false, ErrorCode: "INVALID_PARAMETERS"})
-		return
-	}
 
 	tx := s.db.Begin()
 	defer func() {
@@ -58,8 +59,10 @@ func (s *Service) Deposit(ctx *gin.Context) {
 		}
 	}()
 	balance = balance * 100
+	groupId := uuid.New()
 	newMovement := &movement.Movement{
 		ID:             uuid.New(),
+		GroupID:        groupId,
 		DebitWalletID:  util.GetAssetAccount(),
 		CreditWalletID: userWallet.ID,
 		DebitBalance:   balance,

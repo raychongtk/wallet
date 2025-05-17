@@ -71,3 +71,32 @@ func TestDepositAPIFailedWithInvalidUser(t *testing.T) {
 	assert.NoError(t, responseErr)
 	assert.False(t, response["result"].(bool))
 }
+
+func TestDepositAPIFailedWithInvalidBalance(t *testing.T) {
+	_, cleanup, err := setupTestDB()
+	if err != nil {
+		t.Fatalf("failed to set up test DB: %v", err)
+	}
+	defer cleanup()
+
+	router := ProvideRoutes(service)
+
+	payload := map[string]string{
+		"user_id": "2d988f4a-a037-4ce9-a350-f13445793e81",
+		"balance": "-1",
+	}
+	body, _ := json.Marshal(payload)
+
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/deposit", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp := httptest.NewRecorder()
+	router.ServeHTTP(resp, req)
+
+	assert.Equal(t, http.StatusBadRequest, resp.Code)
+	var response map[string]interface{}
+	println(response["result"])
+	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)
+	assert.NoError(t, responseErr)
+	assert.False(t, response["result"].(bool))
+}

@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func (s *Service) Withdrawal(ctx *gin.Context) {
+func (s *Service) Withdraw(ctx *gin.Context) {
 	var req WithdrawalRequest
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
@@ -26,6 +26,12 @@ func (s *Service) Withdrawal(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &WithdrawalResponse{Result: false, ErrorCode: "INVALID_ACCOUNT"})
 		return
 	}
+	balance, err := util.ConvertToInt(req.Balance)
+	if err != nil || balance <= 0 {
+		ctx.JSON(http.StatusBadRequest, &TransferResponse{Result: false, ErrorCode: "INVALID_PARAMETERS"})
+		return
+	}
+
 	appUser, err := s.userRepo.GetUser(userId)
 	if err != nil {
 		util.Error("Invalid user", zap.Error(err))
@@ -44,11 +50,6 @@ func (s *Service) Withdrawal(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &WithdrawalResponse{Result: false, ErrorCode: "INVALID_ACCOUNT"})
 		return
 	}
-	balance, err := util.ConvertToInt(req.Balance)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, &WithdrawalResponse{Result: false, ErrorCode: "INVALID_PARAMETERS"})
-		return
-	}
 
 	tx := s.db.Begin()
 	defer func() {
@@ -58,12 +59,14 @@ func (s *Service) Withdrawal(ctx *gin.Context) {
 		}
 	}()
 	balance = balance * 100
+	groupId := uuid.New()
 	newMovement := &movement.Movement{
 		ID:             uuid.New(),
+		GroupID:        groupId,
 		DebitWalletID:  util.GetLiabilityAccount(),
 		CreditWalletID: userWallet.ID,
 		DebitBalance:   balance,
-		CreditBalance:  balance,
+		CreditBalance:  -balance,
 		MovementStatus: "COMPLETED",
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
@@ -107,7 +110,7 @@ func (s *Service) Withdrawal(ctx *gin.Context) {
 func commitWithdrawalBalance(s *Service, wallet *wallet.Wallet, balance int, tx *gorm.DB) bool {
 	// Skip reserved balance because we don't need to wait for external clearing operations
 	// customer asset decreased
-	customerAccountErr := s.balanceRepo.DeductBalance(tx, wallet.ID, balance, "COMMITTED")
+	customerAccountErr := s.balanceRepo.DeductBalance(tx, wallet.ID, balance, "COMMITTED", "CUSTOMER")
 	if customerAccountErr != nil {
 		tx.Rollback()
 		return false

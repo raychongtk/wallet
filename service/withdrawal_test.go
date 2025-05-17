@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/google/uuid"
-	"github.com/raychongtk/wallet/util"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -55,7 +54,6 @@ func TestWithdrawalAPI(t *testing.T) {
 }
 
 func TestWithdrawalAPIFailedWithInsufficientBalance(t *testing.T) {
-	util.InitializeLogger(false)
 	_, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
@@ -85,7 +83,6 @@ func TestWithdrawalAPIFailedWithInsufficientBalance(t *testing.T) {
 }
 
 func TestWithdrawalAPIFailedWithInvalidUser(t *testing.T) {
-	util.InitializeLogger(false)
 	_, cleanup, err := setupTestDB()
 	if err != nil {
 		t.Fatalf("failed to set up test DB: %v", err)
@@ -97,6 +94,35 @@ func TestWithdrawalAPIFailedWithInvalidUser(t *testing.T) {
 	payload := map[string]string{
 		"user_id": "2d988f4a-a037-4ce9-a350-f13445793e81",
 		"balance": "100",
+	}
+	body, _ := json.Marshal(payload)
+
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/wallet/withdrawal", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp := httptest.NewRecorder()
+	router.ServeHTTP(resp, req)
+
+	assert.Equal(t, http.StatusBadRequest, resp.Code)
+	var response map[string]interface{}
+	println(response["result"])
+	responseErr := json.Unmarshal(resp.Body.Bytes(), &response)
+	assert.NoError(t, responseErr)
+	assert.False(t, response["result"].(bool))
+}
+
+func TestWithdrawalAPIFailedWithInvalidBalance(t *testing.T) {
+	_, cleanup, err := setupTestDB()
+	if err != nil {
+		t.Fatalf("failed to set up test DB: %v", err)
+	}
+	defer cleanup()
+
+	router := ProvideRoutes(service)
+
+	payload := map[string]string{
+		"user_id": "2d988f4a-a037-4ce9-a350-f13445793e81",
+		"balance": "0",
 	}
 	body, _ := json.Marshal(payload)
 

@@ -10,7 +10,7 @@ import (
 
 type BalanceRepository interface {
 	AddBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error
-	DeductBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error
+	DeductBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string, accountType string) error
 	GetBalance(db *gorm.DB, walletID uuid.UUID, balanceType string) (*wallet.Balance, error)
 }
 
@@ -35,12 +35,12 @@ func (m *PgBalanceRepository) AddBalance(db *gorm.DB, walletID uuid.UUID, balanc
 	return nil
 }
 
-func (m *PgBalanceRepository) DeductBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error {
+func (m *PgBalanceRepository) DeductBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string, accountType string) error {
 	walletBalance, err := m.GetBalance(db, walletID, balanceType)
 	if err != nil {
 		return err
 	}
-	if walletBalance.Balance < balance {
+	if accountType == "CUSTOMER" && walletBalance.Balance < balance {
 		return errors.New("insufficient balance")
 	}
 	walletBalance.Balance -= balance

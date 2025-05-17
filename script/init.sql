@@ -121,6 +121,7 @@ values ('f69815d2-0c50-46a6-9aa9-c5ef1ebddc24',
 create table movement
 (
     id               uuid primary key,
+    group_id         uuid        not null,
     debit_wallet_id  uuid        not null,
     credit_wallet_id uuid        not null,
     debit_balance    int         not null,

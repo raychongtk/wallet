@@ -7,6 +7,7 @@ import (
 
 type Movement struct {
 	ID             uuid.UUID
+	GroupID        uuid.UUID
 	DebitWalletID  uuid.UUID
 	CreditWalletID uuid.UUID
 	DebitBalance   int
