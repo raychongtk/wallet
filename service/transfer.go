@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/raychongtk/wallet/model/movement"
+	"github.com/raychongtk/wallet/model/payment"
 	"github.com/raychongtk/wallet/model/wallet"
 	"github.com/raychongtk/wallet/util"
 	"go.uber.org/zap"
@@ -137,6 +138,24 @@ func (s *Service) Transfer(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &TransferResponse{Result: false, ErrorCode: "INTERNAL_ERROR"})
 		return
 	}
+	paymentHistory := &payment.PaymentHistory{
+		ID:          uuid.New(),
+		PayerUserId: creditUserId.String(),
+		PayerName:   creditAppUser.FirstName + " " + creditAppUser.LastName,
+		PayeeUserId: debitUserId.String(),
+		PayeeName:   debitAppUser.FirstName + " " + debitAppUser.LastName,
+		PayType:     "TRANSFER",
+		Amount:      balance,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	_, err = s.paymentHistoryRepo.CreatePaymentHistory(tx, paymentHistory)
+	if err != nil {
+		tx.Rollback()
+		util.Error("Create history failed", zap.Error(err))
+		return
+	}
+
 	committed := commitTransferBalance(s, debitUserWallet, creditUserWallet, balance, tx)
 
 	if !committed {

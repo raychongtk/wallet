@@ -141,3 +141,16 @@ create table transaction
     created_at   timestamp default current_timestamp,
     updated_at   timestamp
 );
+
+create table payment_history
+(
+    id            uuid primary key,
+    payer_user_id varchar(255),
+    payer_name    varchar(255),
+    payee_user_id varchar(255),
+    payee_name    varchar(255),
+    amount        int         not null,
+    pay_type      varchar(50) not null,
+    created_at    timestamp default current_timestamp,
+    updated_at    timestamp
+);

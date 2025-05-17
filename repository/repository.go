@@ -10,5 +10,6 @@ var (
 		ProvideWalletRepository,
 		ProvideTransactionRepository,
 		ProvideBalanceRepository,
+		ProvidePaymentHistoryRepository,
 	)
 )

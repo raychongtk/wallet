@@ -12,13 +12,14 @@ var (
 )
 
 type Service struct {
-	userRepo        repository.UserRepository
-	movementRepo    repository.MovementRepository
-	accountRepo     repository.AccountRepository
-	walletRepo      repository.WalletRepository
-	transactionRepo repository.TransactionRepository
-	balanceRepo     repository.BalanceRepository
-	db              gorm.DB
+	userRepo           repository.UserRepository
+	movementRepo       repository.MovementRepository
+	accountRepo        repository.AccountRepository
+	walletRepo         repository.WalletRepository
+	transactionRepo    repository.TransactionRepository
+	balanceRepo        repository.BalanceRepository
+	paymentHistoryRepo repository.PaymentHistoryRepository
+	db                 gorm.DB
 }
 
 func ProvideService(
@@ -28,16 +29,18 @@ func ProvideService(
 	walletRepo repository.WalletRepository,
 	transactionRepo repository.TransactionRepository,
 	balanceRepo repository.BalanceRepository,
+	paymentHistoryRepo repository.PaymentHistoryRepository,
 	db gorm.DB,
 ) (*Service, error) {
 	return &Service{
-		userRepo:        userRepo,
-		movementRepo:    movementRepo,
-		accountRepo:     accountRepo,
-		walletRepo:      walletRepo,
-		transactionRepo: transactionRepo,
-		balanceRepo:     balanceRepo,
-		db:              db,
+		userRepo:           userRepo,
+		movementRepo:       movementRepo,
+		accountRepo:        accountRepo,
+		walletRepo:         walletRepo,
+		transactionRepo:    transactionRepo,
+		balanceRepo:        balanceRepo,
+		paymentHistoryRepo: paymentHistoryRepo,
+		db:                 db,
 	}, nil
 }
 

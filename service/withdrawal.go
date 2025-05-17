@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/raychongtk/wallet/model/movement"
+	"github.com/raychongtk/wallet/model/payment"
 	"github.com/raychongtk/wallet/model/wallet"
 	"github.com/raychongtk/wallet/util"
 	"go.uber.org/zap"
@@ -31,6 +32,7 @@ func (s *Service) Withdraw(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, &TransferResponse{Result: false, ErrorCode: "INVALID_PARAMETERS"})
 		return
 	}
+	util.With(zap.String("user_id", userId.String()), zap.Int("balance", balance))
 
 	appUser, err := s.userRepo.GetUser(userId)
 	if err != nil {
@@ -74,7 +76,7 @@ func (s *Service) Withdraw(ctx *gin.Context) {
 	createdMovement, err := s.movementRepo.CreateMovement(tx, newMovement)
 	if err != nil {
 		tx.Rollback()
-		util.Error("Create movement failed", zap.String("user_id", userId.String()), zap.Int("balance", balance), zap.Error(err))
+		util.Error("Create movement failed", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, &WithdrawalResponse{Result: false, ErrorCode: "INTERNAL_ERROR"})
 		return
 	}
@@ -82,27 +84,45 @@ func (s *Service) Withdraw(ctx *gin.Context) {
 	err = s.transactionRepo.CreateTransactions(tx, transactions)
 	if err != nil {
 		tx.Rollback()
-		util.Error("Create payment transaction failed", zap.String("user_id", userId.String()), zap.Int("balance", balance), zap.Error(err))
+		util.Error("Create payment transaction failed", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, &WithdrawalResponse{Result: false, ErrorCode: "INTERNAL_ERROR"})
 		return
 	}
+	paymentHistory := &payment.PaymentHistory{
+		ID:          uuid.New(),
+		PayerUserId: "System",
+		PayerName:   "System",
+		PayeeUserId: userId.String(),
+		PayeeName:   appUser.FirstName + " " + appUser.LastName,
+		PayType:     "WITHDRAWAL",
+		Amount:      balance,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	_, err = s.paymentHistoryRepo.CreatePaymentHistory(tx, paymentHistory)
+	if err != nil {
+		tx.Rollback()
+		util.Error("Create history failed", zap.Error(err))
+		return
+	}
+
 	committed := commitWithdrawalBalance(s, userWallet, balance, tx)
 
 	if !committed {
 		tx.Rollback()
-		util.Error("Update balance failed", zap.String("user_id", userId.String()), zap.Int("balance", balance), zap.Error(err))
+		util.Error("Update balance failed", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, &WithdrawalResponse{Result: false, ErrorCode: "INTERNAL_ERROR"})
 		return
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		tx.Rollback()
-		util.Error("Commit transaction failed", zap.String("user_id", userId.String()), zap.Int("balance", balance), zap.Error(err))
+		util.Error("Commit transaction failed", zap.Error(err))
 		ctx.JSON(http.StatusInternalServerError, &WithdrawalResponse{Result: false, ErrorCode: "INTERNAL_ERROR"})
 		return
 	}
 
-	util.Info("Withdrawal successfully", zap.String("user_id", userId.String()), zap.Int("balance", balance))
+	util.Info("Withdrawal successfully")
 	ctx.JSON(http.StatusOK, &WithdrawalResponse{Result: true})
 }
 
