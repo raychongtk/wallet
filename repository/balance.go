@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/google/uuid"
 	"github.com/raychongtk/wallet/model/wallet"
 	"gorm.io/gorm"
@@ -8,7 +9,9 @@ import (
 )
 
 type BalanceRepository interface {
-	UpdateBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error
+	AddBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error
+	DeductBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error
+	GetBalance(db *gorm.DB, walletID uuid.UUID, balanceType string) (*wallet.Balance, error)
 }
 
 type PgBalanceRepository struct {
@@ -19,12 +22,28 @@ func ProvideBalanceRepository(db gorm.DB) BalanceRepository {
 	return &PgBalanceRepository{&db}
 }
 
-func (m *PgBalanceRepository) UpdateBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error {
+func (m *PgBalanceRepository) AddBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error {
 	walletBalance, err := m.GetBalance(db, walletID, balanceType)
 	if err != nil {
 		return err
 	}
 	walletBalance.Balance += balance
+	result := db.Save(walletBalance)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (m *PgBalanceRepository) DeductBalance(db *gorm.DB, walletID uuid.UUID, balance int, balanceType string) error {
+	walletBalance, err := m.GetBalance(db, walletID, balanceType)
+	if err != nil {
+		return err
+	}
+	if walletBalance.Balance < balance {
+		return errors.New("insufficient balance")
+	}
+	walletBalance.Balance -= balance
 	result := db.Save(walletBalance)
 	if result.Error != nil {
 		return result.Error

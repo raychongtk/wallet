@@ -1,4 +1,4 @@
-.PHONY: pre-commit run
+.PHONY: pre-commit start stop
 
 pre-commit:
 	go mod tidy
@@ -7,7 +7,7 @@ pre-commit:
 	go vet
 	go fmt ./...
 
-run:
+start:
 	docker-compose up -d
 	go run github.com/raychongtk/wallet
 

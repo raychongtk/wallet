@@ -45,5 +45,6 @@ func ProvideRoutes(service *Service) *gin.Engine {
 	r := gin.New()
 
 	r.POST("/api/v1/wallet/deposit", service.Deposit)
+	r.POST("/api/v1/wallet/withdrawal", service.Withdrawal)
 	return r
 }
