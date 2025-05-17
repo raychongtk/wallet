@@ -5,7 +5,8 @@ This project is to create a wallet service for PoC.
 # Tech Stack
 - Go 1.23
 - Postgresql
-- Redis
+- Docker
+- Docker Compose
 - Wire
 - Gin
 - Gorm
@@ -17,7 +18,7 @@ This project is to create a wallet service for PoC.
 ---
 # How to run?
 1. Spin up necessary dependencies by running `docker-compose up -d`
-2. Execute Makefile by running `make` command in your terminal
+2. Execute Makefile by running `make run` command in your terminal
 ---
 
 # API Design
