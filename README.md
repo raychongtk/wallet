@@ -12,6 +12,7 @@ This project is to create a wallet service for PoC.
 - Gin
 - Gorm
 - Viper
+- Zap
 ---
 # Prerequisite
 - Docker must be installed
@@ -71,6 +72,7 @@ erDiagram
     Movement ||--|{ Transaction : create
     Movement {
         uuid id
+        uuid group_id
         uuid debit_wallet_id
         uuid credit_wallet_id
         decimal balance
@@ -85,6 +87,17 @@ erDiagram
         uuid credit_wallet_id
         string balance_type
         decimal balance
+        timestamp created_at
+        timestamp updated_at
+    }
+    PaymentHistory {
+        uuid id
+        string payer_user_id
+        string payer_name
+        string payee_user_id
+        string payee_name
+        int    amount
+        string pay_type
         timestamp created_at
         timestamp updated_at
     }
@@ -207,6 +220,10 @@ It should be able to aggregate money efficiently for different use cases, for ex
 
 ## Partition
 Ledger is a data intensive application which we need to store any movement to the system. When the business growth, we need to design the storage in partition or sharding so that we can provide more scalability to the system.
+- Payment History
+- Movement
+- Transaction
+The above 3 tables must be partitioned to improve performance and scalability. We can partition the data by time. For example, we can partition the data by month or by year. This can improve the performance of the system when the data grow quickly.
 
 ## Hot/Cold Data Separation
 Hot/Cold Data Separation can also improve scalability when data grow quickly. This can improve both read and write performance in huge data size scenarios.
