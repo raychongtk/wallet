@@ -6,7 +6,7 @@ import (
 )
 
 type MovementRepository interface {
-	CreateMovement(movement *movement.Movement) (*movement.Movement, error)
+	CreateMovement(db *gorm.DB, movement *movement.Movement) (*movement.Movement, error)
 }
 
 type PgMovementRepository struct {
@@ -17,8 +17,8 @@ func ProvideMovementRepository(db gorm.DB) MovementRepository {
 	return &PgMovementRepository{&db}
 }
 
-func (m *PgMovementRepository) CreateMovement(movement *movement.Movement) (*movement.Movement, error) {
-	result := m.db.Create(movement)
+func (m *PgMovementRepository) CreateMovement(db *gorm.DB, movement *movement.Movement) (*movement.Movement, error) {
+	result := db.Create(movement)
 	if result.Error != nil {
 		return nil, result.Error
 	}

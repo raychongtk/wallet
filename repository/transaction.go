@@ -6,7 +6,7 @@ import (
 )
 
 type TransactionRepository interface {
-	CreateTransactions(transaction []movement.Transaction) error
+	CreateTransactions(db *gorm.DB, transaction []movement.Transaction) error
 }
 
 type PgTransactionRepository struct {
@@ -17,8 +17,8 @@ func ProvideTransactionRepository(db gorm.DB) TransactionRepository {
 	return &PgTransactionRepository{&db}
 }
 
-func (m *PgTransactionRepository) CreateTransactions(transactions []movement.Transaction) error {
-	result := m.db.Create(transactions)
+func (m *PgTransactionRepository) CreateTransactions(db *gorm.DB, transactions []movement.Transaction) error {
+	result := db.Create(transactions)
 	if result.Error != nil {
 		return result.Error
 	}

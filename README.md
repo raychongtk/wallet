@@ -183,6 +183,11 @@ flowchart TB
 Movement is a state machine. It should have multiple statuses to indicate the current stage of the fund. We create the movement in pending state and reserve the balance. When we receive callback from payment gateway, we settle the fund and move reserved balance to committed balance.
 With that, we can form a state machine to track the fund movement.
 
+## Hotspot Wallet
+Some wallets may have a lot of transactions and become a hotspot wallet. 
+We need to design the system to handle the hotspot wallet.
+For example, we can update balance in Redis and batch update to Postgresql for hotspot wallets.
+
 ## Observability
 Funds should be observable so that the engineering team and operation team can learn the current funds state.
 It indicates whether the treasury system is healthy or not. If any abnormal happens, an alert should be triggered.
