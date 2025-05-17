@@ -125,11 +125,13 @@ erDiagram
 - Assume all transactions are settled immediately without any payment gateway
 - Assume all wallets are open and available for money movement
 - Assume all wallets are in single currency and in USD
+
 ---
 
 # Secret Management
 In real world, we should not store secrets in the code. Instead, it should be stored in secret managers.
 In this demo, I just store the secrets in the code for simplicity.
+
 ---
 
 # Design Consideration
