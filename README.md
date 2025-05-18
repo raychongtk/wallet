@@ -169,7 +169,7 @@ Money movement and transaction logs must be strong consistent. Either all operat
 Also, pessimistic lock should be applied to avoid concurrency write to a wallet to ensure balance update is accurate. This is to guarantee data quality in the ledger.
 
 ## Traceable
-Ledger should maintain traces to keep track all events happened in the platform. All transactions should be traceable includes involved action, parties, money, and when.
+Ledger should maintain traces to keep track all events happened in the platform. All transactions should be traceable includes involved action, parties, money, and when. We can also use the transaction logs to rebuild wallet state as we record every event that happens in a wallet.
 
 ## Immutable
 Ledger transactions and movements should be append-only. Once it is created, it is not allowed to modify.
