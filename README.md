@@ -29,6 +29,13 @@ This project is to create a wallet service for PoC.
   - model package stores all database domain models
   - repository package stores all database repository implementation
 ---
+# Scope
+- Deposit
+- Withdrawal
+- Transfer
+- View Balance
+- View Payment History
+---
 
 # API Design
 - Endpoint follows RESTful style to provide resource-based API
@@ -125,6 +132,7 @@ erDiagram
 - Assume all transactions are settled immediately without any payment gateway
 - Assume all wallets are open and available for money movement
 - Assume all wallets are in single currency and in USD
+- Assume only wallet and ledger is involved and no payment channel is needed
 
 ---
 
@@ -226,6 +234,12 @@ flowchart TB
     JPY --> ReservedCredit
     JPY --> Committed
 ```
+**Balance Type**
+- Reserved Credit - On-hold Balance
+- Reserved Debit - On-hold Balance
+- Committed - Committed Balance
+
+---
 
 # Testing
 ## Integration Testing
@@ -277,6 +291,14 @@ flowchart TD
     PaymentGateway --> PaymentOrchestrator
     PaymentOrchestrator -...-> LedgerService
     LedgerService -...-> LedgerReadReplica
+    LedgerService --> Wallet
+    LedgerService --> RequestLog
+    RequestLog --> Idempotency
+    LedgerService --> TransactionLog
+    TransactionLog --> AppendOnly
+    TransactionLog --> DoubleEntryBookkeeping
+    AccessControl --> RBAC
+    LedgerService --> AccessControl
     LedgerReadReplica --> Snapshot
     LedgerReadReplica --> Aggregation
     LedgerReadReplica --> DataProvider
