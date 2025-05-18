@@ -1,4 +1,4 @@
-.PHONY: pre-commit start stop
+.PHONY: pre-commit start stop test
 
 pre-commit:
 	go mod tidy
@@ -13,3 +13,6 @@ start:
 
 stop:
 	docker-compose down
+
+test:
+	go test -json ./...

@@ -21,7 +21,13 @@ This project is to create a wallet service for PoC.
 ---
 # How to run?
 - Execute Makefile by running `make` and `make start` commands in your terminal
+- Run without make file
+  - Start docker via `docker-compose up -d`
+  - Start app via `go run github.com/raychongtk/wallet`
+- Test
+  - Run `go test -json ./...`
 ---
+
 # How to review?
 - Go through the ReadMe file to understand the design and architecture
 - Go through the code to understand the implementation
