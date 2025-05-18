@@ -323,6 +323,8 @@ flowchart TD
     Observability --> Dashboard
     Alert --> InsufficientFunds
     Alert --> UnclearFunds
+    InsufficientFunds --> HandledByOpsOrEngineer
+    UnclearFunds --> HandledByOpsOrEngineer
     LedgerService -...-> Traceability
     Traceability --> AuditLog
     Traceability --> FundMovement
