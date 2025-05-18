@@ -18,7 +18,7 @@ func redisConnection() *redis.Client {
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     config.RedisHost,
 		Password: config.RedisPassword,
-		DB:       0,
+		DB:       config.RedisDB,
 	})
 
 	// Test connection
@@ -35,4 +35,5 @@ func redisConnection() *redis.Client {
 type RedisConfig struct {
 	RedisHost     string `mapstructure:"REDIS_HOST"`
 	RedisPassword string `mapstructure:"REDIS_PASSWORD"`
+	RedisDB       int    `mapstructure:"REDIS_DB"`
 }
