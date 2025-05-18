@@ -3,23 +3,25 @@ This project is to create a wallet service for PoC.
 
 ---
 # Tech Stack
-- Go 1.23
-- Postgresql
-- Redis
-- Docker
-- Docker Compose
-- Testcontainers
-- Wire
-- Gin
-- Gorm
-- Viper
-- Zap
+- Go 1.23 - Programming Language
+- Postgresql - Database
+- Redis - Cache/In-memory DB
+- Docker - Containerization
+- Docker Compose - Container Orchestration
+- Testcontainers - Integration Testing
+- Wire - Dependency Injection
+- Gin - HTTP Web Framework
+- Gorm - ORM
+- Viper - Configuration
+- Zap - Logger
 ---
 # Prerequisite
 - Docker and Docker Compose must be installed
 - If you get any error related to wire, please install `go get github.com/google/wire/cmd/wire` and make sure `$GOPATH/bin` is in your terminal path
 ---
 # How to run?
+- All seed data is in the `./script/init.sql` file
+- All config/environment variables are in the `dev.env` file
 - Execute Makefile by running `make` and `make start` commands in your terminal
 - Run without make file
   - Start docker via `docker-compose up -d`
