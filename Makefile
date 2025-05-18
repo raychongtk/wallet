@@ -9,6 +9,7 @@ pre-commit:
 
 start:
 	docker-compose up -d
+	sleep 5
 	go run github.com/raychongtk/wallet
 
 stop:
