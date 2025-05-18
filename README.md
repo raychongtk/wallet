@@ -139,6 +139,7 @@ erDiagram
 - Assume all wallets are open and available for money movement
 - Assume all wallets are in single currency and in USD
 - Assume only wallet and ledger is involved and no payment channel is needed
+- Assume duplicate request is not allowed and need to be rejected
 
 ---
 
