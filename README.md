@@ -145,7 +145,8 @@ Monolith architecture is selected for this PoC. Although we should adopt distrib
 Instead, we keep it simple and modular. When we need to split the system into microservices, we can move code to separate project quickly.
 
 ## Strong Consistency
-Money movement and transaction logs must be strong consistent. Either all operations success or all failed. No partial success is accepted. This is to guarantee data quality in the ledger.
+Money movement and transaction logs must be strong consistent. Either all operations success or all failed. No partial success is accepted.
+Also, pessimistic lock should be applied to avoid concurrency write to a wallet to ensure balance update is accurate. This is to guarantee data quality in the ledger.
 
 ## Traceable
 Ledger should maintain traces to keep track all events happened in the platform. All transactions should be traceable includes involved action, parties, money, and when.
