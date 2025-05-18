@@ -148,6 +148,9 @@ Deposit, Withdrawal, and Transfer are idempotent. Request must be provided with 
 It means that if the same request is sent multiple times, the result will be the same as sending it once. This is to prevent double spending and ensure data consistency.
 Instead of sending back the same response, this PoC choose to reject the duplicated request.
 
+## Pagination
+Search Payment History should be paginated to avoid performance issue.
+
 ## Keep It Simple
 Monolith architecture is selected for this PoC. Although we should adopt distributed architecture for better scalability and availability, this is not suitable in this PoC. If we introduce microservices in this PoC, it will overkill the whole design.
 Instead, we keep it simple and modular. When we need to split the system into microservices, we can move code to separate project quickly.

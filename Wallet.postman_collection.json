@@ -268,7 +268,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/v1/wallet/payment-history?user_id=2d988f4a-a037-4ce9-a350-f13445793e88",
+					"raw": "http://localhost:8080/api/v1/wallet/payment-history?user_id=2d988f4a-a037-4ce9-a350-f13445793e88&page=1&pageSize=2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -284,6 +284,14 @@
 						{
 							"key": "user_id",
 							"value": "2d988f4a-a037-4ce9-a350-f13445793e88"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "2"
 						}
 					]
 				}

@@ -6,7 +6,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/raychongtk/wallet/util"
 	"go.uber.org/zap"
+	"math"
 	"net/http"
+	"strconv"
 )
 
 func (s *Service) GetPaymentHistory(ctx *gin.Context) {
@@ -16,14 +18,15 @@ func (s *Service) GetPaymentHistory(ctx *gin.Context) {
 		ctx.Status(http.StatusBadRequest)
 		return
 	}
-
+	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "10"))
 	appUser, err := s.userRepo.GetUser(userId)
 	if err != nil {
 		util.Error("Invalid user", zap.Error(err))
 		ctx.Status(http.StatusBadRequest)
 		return
 	}
-	histories, err := s.paymentHistoryRepo.SearchPaymentHistory(appUser.ID.String())
+	histories, err := s.paymentHistoryRepo.SearchPaymentHistory(appUser.ID.String(), page, pageSize)
 	if err != nil {
 		util.Error("search payment history failed", zap.Error(err))
 		ctx.Status(http.StatusBadRequest)
@@ -31,16 +34,21 @@ func (s *Service) GetPaymentHistory(ctx *gin.Context) {
 	}
 
 	var paymentHistories []PaymentHistory
-	for i := 0; i < len(histories); i++ {
+	for i := 0; i < len(histories.Data); i++ {
 		paymentHistory := PaymentHistory{
-			PayerName: histories[i].PayerName,
-			PayeeName: histories[i].PayeeName,
-			PayType:   histories[i].PayType,
-			Amount:    adjustBalanceByPaymentDirection(histories[i].PayType, histories[i].PayerUserId, appUser.ID.String(), histories[i].Amount),
+			PayerName: histories.Data[i].PayerName,
+			PayeeName: histories.Data[i].PayeeName,
+			PayType:   histories.Data[i].PayType,
+			Amount:    adjustBalanceByPaymentDirection(histories.Data[i].PayType, histories.Data[i].PayerUserId, appUser.ID.String(), histories.Data[i].Amount),
 		}
 		paymentHistories = append(paymentHistories, paymentHistory)
 	}
-	ctx.JSON(http.StatusOK, &SearchPaymentHistoryResponse{Histories: paymentHistories})
+	ctx.JSON(http.StatusOK, &SearchPaymentHistoryResponse{
+		Histories:  paymentHistories,
+		TotalCount: histories.TotalCount,
+		TotalPages: calculateTotalPages(histories.TotalCount, histories.PageSize),
+		Page:       histories.Page,
+		PageSize:   histories.PageSize})
 }
 
 func adjustBalanceByPaymentDirection(payType string, payerUserId string, requestedUserId string, amount int) string {
@@ -54,8 +62,19 @@ func adjustBalanceByPaymentDirection(payType string, payerUserId string, request
 	return fmt.Sprintf("%.2f", float64(amount*multiplier)/100)
 }
 
+func calculateTotalPages(totalCount int64, pageSize int) int {
+	if pageSize <= 0 {
+		return 0
+	}
+	return int(math.Ceil(float64(totalCount) / float64(pageSize)))
+}
+
 type SearchPaymentHistoryResponse struct {
-	Histories []PaymentHistory `json:"histories"`
+	Histories  []PaymentHistory `json:"histories"`
+	TotalCount int64            `json:"total_count"`
+	TotalPages int              `json:"total_pages"`
+	Page       int              `json:"page"`
+	PageSize   int              `json:"page_size"`
 }
 
 type PaymentHistory struct {
